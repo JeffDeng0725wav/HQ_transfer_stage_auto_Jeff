@@ -1,0 +1,73 @@
+Commands for the Named Pipe server:
+address: \\.\pipe\HQ_server
+required newline at end of command is included in python example automatically (\n)
+
+SETPOS
+example: SETPOSX2.0
+
+GETPOS
+example: GETPOSX
+
+
+SETOBJ
+example: SETOBJ1
+
+GETOBJ
+example: GETOBJ
+
+GETMAG
+example: GETMAG
+
+AUTFOC<Distance in mm>
+example: AUTFOC
+example: AUTFOC1
+
+AUTFOCWIDE<Distance in mm>
+example: AUTFOCWIDE
+example: AUTFOCWIDE1
+
+
+
+PIC:<folder> Takes picture
+example: PIC:C:\Users\Feitze\test
+file extensions are added automatically
+
+WIDE:<folder> Takes picture on wide angle camera
+example: PIC:C:\Users\Feitze\test
+file extensions are added automatically
+
+SCANDONE
+example: SCANDONE
+
+SAVEPOS:<name>
+example SAVEPOS:test
+
+STOPHEAT
+
+GETTEMP
+example:
+GETTEMP
+
+SETTEMP:<number>
+example: SETTEMP73
+
+Raw list:
+SETPOS
+SETZ
+LEDON
+LEDOFF
+GETPOS
+GETZ
+SETOBJ
+GETOBJ
+GETMAG
+SETMAG
+GETTEMP
+SETTEMP:
+STOPHEAT
+SCANDONE
+AUTFOC
+AUTFOCWIDE
+SAVEPOS:
+PIC:
+WIDE:
