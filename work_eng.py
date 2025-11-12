@@ -376,7 +376,7 @@ class Main(QWidget):
 
     def _safe(self, fn):
         try:
-            if not self.ctrl:
+            if not self.ctrl or not getattr(self.ctrl, "connected", False):
                 QMessageBox.warning(self, "Not Connected", "Please connect first.")
                 return
             fn()
@@ -385,29 +385,37 @@ class Main(QWidget):
 
     # ==== connect/disconnect ====
     def _connect(self):
-        if self.ctrl:
+        if self.ctrl and getattr(self.ctrl, "connected", False):
             QMessageBox.information(self, "Info", "Already connected.")
             return
         try:
-            self.ctrl = MicroscopeController(debug=False)  # constructor connects
+            self.ctrl = MicroscopeController(debug=False)  # constructor tries to connect
+            if not getattr(self.ctrl, "connected", False):
+                # 控制器对象创建了，但没有连上——当作失败处理
+                self.ctrl = None
+                raise RuntimeError("Failed to connect to \\\\.\\pipe\\HQ_server (pipe not available or refused).")
             QMessageBox.information(self, "Success", "Connected to \\\\.\\pipe\\HQ_server.")
         except Exception as e:
             self.ctrl = None
             QMessageBox.critical(self, "Connection Failed", str(e))
 
     def _disconnect(self):
-        if not self.ctrl: return
+        if not self.ctrl:
+            return
         try:
+            # 有些实现是 ctrl.close()，有些是 ctrl.disconnect()；保持你原来的
             self.ctrl.close()
-            self.ctrl = None
-            QMessageBox.information(self, "Disconnected", "Connection closed.")
         except Exception as e:
             QMessageBox.critical(self, "Error", str(e))
+        finally:
+            self.ctrl = None
+            QMessageBox.information(self, "Disconnected", "Connection closed.")
 
     # ==== magnification change ====
     def _on_mag_change(self, txt: str):
         self.s.target_mag = float(txt or 10)
-        if not self.ctrl: return
+        if not self.ctrl or not getattr(self.ctrl, "connected", False):
+            return
         try:
             ok = self.ctrl.set_magnification(self.s.target_mag)
             if not ok:
@@ -421,7 +429,7 @@ class Main(QWidget):
 
     # ==== read current XY ====
     def _read_xy(self, to: str):
-        if not self.ctrl:
+        if not self.ctrl or not getattr(self.ctrl, "connected", False):
             QMessageBox.warning(self, "Not Connected", "Please connect first.")
             return
         x = float(self.ctrl.get_x_position())
